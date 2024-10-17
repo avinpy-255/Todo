@@ -20,6 +20,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/health", s.healthHandler)
 
+	r.Get("/auth/{provider}", s.beginAuthProviderCallback)
+
 	r.Get("/auth/{provider}/callback", s.getAuthCallbackFunction)
 
 	return r
@@ -55,4 +57,10 @@ func (s *Server) getAuthCallbackFunction(w http.ResponseWriter, r *http.Request)
 	fmt.Println(user)
 
 	http.Redirect(w, r, "http://localhost:5173", http.StatusFound)
+}
+
+func (s *Server) beginAuthProviderCallback(w http.ResponseWriter, r *http.Request) {
+	provider := chi.URLParam(r, "provider")
+	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
+	gothic.BeginAuthHandler(w, r)
 }

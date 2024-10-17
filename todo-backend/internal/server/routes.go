@@ -50,13 +50,14 @@ func (s *Server) getAuthCallbackFunction(w http.ResponseWriter, r *http.Request)
 
 	user, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
-		fmt.Fprintln(w, r)
+		http.Error(w, "Authentication failed. Please try again.", http.StatusUnauthorized)
+		fmt.Println("OAuth Authentication Error:", err)
 		return
 	}
 
-	fmt.Println(user)
+	fmt.Println("AuthenticatedUser:", user)
 
-	http.Redirect(w, r, "http://localhost:5173", http.StatusFound)
+	http.Redirect(w, r, "http://localhost:5173/dashboard", http.StatusFound)
 }
 
 func (s *Server) beginAuthProviderCallback(w http.ResponseWriter, r *http.Request) {
